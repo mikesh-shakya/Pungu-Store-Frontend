@@ -77,7 +77,7 @@ const LoginPage = () => {
           toast.success("User LoggedIn Successfully...");
         })
         .catch((error) => {
-          if (error.response) {
+          if (error.response.data.message) {
             toast.error(`❌ ${error.response.data.message}`);
           } else {
             toast.error("ohhoo!! It's not you, It's us.");

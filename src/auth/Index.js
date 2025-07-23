@@ -20,7 +20,7 @@ export const doLogout = (next) => {
 //get Current User
 export const getCurrentUser = () => {
   if (isLoggedIn()) {
-    return JSON.parse(sessionStorage.getItem("data"))?.userDTO;
+    return JSON.parse(sessionStorage.getItem("data"))?.username;
   } else {
     return null;
   }

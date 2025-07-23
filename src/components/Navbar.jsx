@@ -1,4 +1,3 @@
-import * as React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -14,6 +13,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import { doLogout, getCurrentUser } from "../auth/Index";
+import { useEffect, useState } from "react";
 
 const pages = ["Home", "Books", "Authors", "About"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
@@ -21,11 +21,11 @@ const settings = ["Profile", "Account", "Dashboard", "Logout"];
 function NavBar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [user, setUser] = React.useState(null);
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [user, setUser] = useState(null);
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // setUser(getCurrentUser());
     setUser(getCurrentUser());
   }, []);
