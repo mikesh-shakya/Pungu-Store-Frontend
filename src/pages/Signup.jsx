@@ -12,50 +12,66 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useState } from "react";
-import BaseTemplate from "../components/BaseTemplate";
 import { Link, useNavigate } from "react-router-dom";
 import { signUp } from "../services/Userservices";
 import { toast } from "react-toastify";
 
+// Field configuration
+const formFields = [
+  { name: "firstName", label: "First Name", type: "text", required: true },
+  { name: "middleName", label: "Middle Name", type: "text", required: false },
+  { name: "lastName", label: "Last Name", type: "text", required: true },
+  { name: "username", label: "Username", type: "text", required: true },
+  { name: "email", label: "Email", type: "email", required: true },
+  { name: "password", label: "Password", type: "password", required: true },
+  {
+    name: "confirmPassword",
+    label: "Confirm Password",
+    type: "password",
+    required: true,
+  },
+];
+
 const SignupPage = () => {
-  const [form, setForm] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const initialFormState = Object.fromEntries(
+    formFields.map((field) => [field.name, ""])
+  );
+
+  const [form, setForm] = useState(initialFormState);
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const navigate = useNavigate();
+
   const formIsValid =
-    Object.values(form).every((val) => val.trim() !== "") &&
+    formFields
+      .filter((field) => field.required)
+      .every(({ name }) =>
+        typeof form[name] === "string"
+          ? form[name].trim() !== ""
+          : form[name] !== null && form[name] !== undefined
+      ) &&
     Object.values(errors).every((err) => !err) &&
     acceptedTerms;
 
   const getFieldError = (name, value, compareTo = null) => {
     switch (name) {
-      case "fullName":
-        if (!value.trim()) return "Full name is required";
+      case "firstName":
+      case "lastName":
+      case "username":
+        if (!value.trim())
+          return `${name.replace(/^\w/, (c) => c.toUpperCase())} is required`;
         break;
       case "email":
         if (!value) return "Email is required";
         if (!/^\S+@\S+\.\S+$/.test(value)) return "Enter a valid email";
         break;
       case "password":
-        {
-          if (!value) return "Password is required";
-          if (value.length < 6) return "Password must be at least 6 characters";
-
-          const hasLowercase = /[a-z]/.test(value);
-          const hasUppercase = /[A-Z]/.test(value);
-          const hasDigit = /[0-9]/.test(value);
-          // const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
-
-          if (!hasLowercase || !hasUppercase || !hasDigit) {
-            return "Password must include at least 1 uppercase, 1 lowercase and a number";
-          }
+        if (!value) return "Password is required";
+        if (value.length < 6) return "Password must be at least 6 characters";
+        if (!/[a-z]/.test(value) || !/[A-Z]/.test(value) || !/\d/.test(value)) {
+          return "Password must include uppercase, lowercase, and a number";
         }
         break;
       case "confirmPassword":
@@ -70,10 +86,13 @@ const SignupPage = () => {
 
   const validate = () => {
     const newErrors = {};
-    for (const key in form) {
-      newErrors[key] = getFieldError(key, form[key], form.password);
+    for (const field of formFields) {
+      newErrors[field.name] = getFieldError(
+        field.name,
+        form[field.name],
+        form.password
+      );
     }
-
     setErrors(newErrors);
     return Object.values(newErrors).every((err) => !err);
   };
@@ -84,42 +103,33 @@ const SignupPage = () => {
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
   };
 
   const handleSignup = (e) => {
     e.preventDefault();
     if (validate()) {
-      console.log("Signup data:", form);
-      // Submit to server here
       signUp(form)
-        .then((resp) => {
-          console.log(resp);
-          toast.success("User is Registered successfully !!!");
+        .then(() => {
+          toast.success("User is Registered successfully!");
           navigate("/login");
-          setForm({
-            firstName: "",
-            lastName: "",
-            email: "",
-            password: "",
-          });
+          setForm(initialFormState);
         })
         .catch((error) => {
           if (error.response) {
             toast.error(`❌ ${error.response.data.message}`);
           } else {
-            toast.error("ohhoo!! It's not you, It's us.");
+            toast.error("Something went wrong. Please try again.");
           }
         });
     }
   };
 
   return (
-    <BaseTemplate>
       <Container
         maxWidth="sm"
         sx={{
@@ -142,87 +152,54 @@ const SignupPage = () => {
           <Typography variant="h5" fontWeight="bold" gutterBottom>
             Create an Account
           </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSignup}
-            noValidate
-            autoComplete="off"
-            sx={{ mt: 2 }}
-          >
-            <TextField
-              fullWidth
-              name="fullName"
-              label="Full Name"
-              type="text"
-              variant="outlined"
-              margin="normal"
-              required
-              value={form.fullName}
-              onChange={handleChange}
-              onBlur={(e) => validateField(e.target.name, e.target.value)}
-              error={Boolean(errors.fullName)}
-              helperText={errors.fullName}
-            />
-            <TextField
-              fullWidth
-              name="email"
-              label="Email"
-              type="email"
-              variant="outlined"
-              margin="normal"
-              required
-              value={form.email}
-              onChange={handleChange}
-              onBlur={(e) => validateField(e.target.name, e.target.value)}
-              error={Boolean(errors.email)}
-              helperText={errors.email}
-            />
-            <TextField
-              fullWidth
-              name="password"
-              label="Password"
-              type={showPassword ? "text" : "password"}
-              variant="outlined"
-              margin="normal"
-              required
-              value={form.password}
-              onChange={handleChange}
-              onBlur={(e) => validateField(e.target.name, e.target.value)}
-              error={Boolean(errors.password)}
-              helperText={errors.password}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword(!showPassword)}>
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <TextField
-              fullWidth
-              name="confirmPassword"
-              label="Confirm Password"
-              type={showConfirm ? "text" : "password"}
-              variant="outlined"
-              margin="normal"
-              required
-              value={form.confirmPassword}
-              onChange={handleChange}
-              onBlur={(e) => validateField(e.target.name, e.target.value)}
-              error={Boolean(errors.confirmPassword)}
-              helperText={errors.confirmPassword}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={() => setShowConfirm(!showConfirm)}>
-                      {showConfirm ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
+          <Box component="form" onSubmit={handleSignup} sx={{ mt: 2 }}>
+            {formFields.map((field) => {
+              const isPassword = field.type === "password";
+              const show =
+                field.name === "password"
+                  ? showPassword
+                  : field.name === "confirmPassword"
+                    ? showConfirm
+                    : false;
+
+              const toggleShow =
+                field.name === "password"
+                  ? () => setShowPassword((prev) => !prev)
+                  : field.name === "confirmPassword"
+                    ? () => setShowConfirm((prev) => !prev)
+                    : undefined;
+
+              return (
+                <TextField
+                  key={field.name}
+                  fullWidth
+                  name={field.name}
+                  label={field.label}
+                  type={isPassword ? (show ? "text" : "password") : field.type}
+                  variant="outlined"
+                  margin="normal"
+                  required={field.required}
+                  value={form[field.name]}
+                  onChange={handleChange}
+                  onBlur={(e) => validateField(e.target.name, e.target.value)}
+                  error={Boolean(errors[field.name])}
+                  helperText={errors[field.name]}
+                  InputProps={
+                    isPassword
+                      ? {
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton onClick={toggleShow}>
+                                {show ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }
+                      : undefined
+                  }
+                />
+              );
+            })}
 
             <FormControlLabel
               control={
@@ -251,6 +228,7 @@ const SignupPage = () => {
               Sign Up
             </Button>
           </Box>
+
           <Box mt={3} textAlign="center">
             <Typography variant="body2">
               Already have an account?{" "}
@@ -264,7 +242,6 @@ const SignupPage = () => {
           </Box>
         </Paper>
       </Container>
-    </BaseTemplate>
   );
 };
 

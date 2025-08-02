@@ -2,8 +2,6 @@ import {
   Card,
   CardContent,
   Typography,
-  CardActions,
-  Button,
   Box,
   Avatar,
 } from "@mui/material";
@@ -23,9 +21,9 @@ function PoemCard({
         borderRadius: 3,
         boxShadow: 3,
         p: 2,
-        transition: "transform 0.2s ease",
+        transition: "transform 0.25s ease",
         "&:hover": {
-          transform: "scale(1.03)",
+          transform: "scale(1.05)",
         },
       }}
     >
@@ -45,11 +43,6 @@ function PoemCard({
           by {author}
         </Typography>
       </CardContent>
-      {/* <CardActions>
-        <Button size="small" onClick={onClick}>
-          Read More
-        </Button>
-      </CardActions> */}
     </Card>
   );
 }

@@ -1,11 +1,4 @@
-import {
-  Box,
-  Container,
-  Typography,
-  Grid,
-  Button,
-} from "@mui/material";
-import BaseTemplate from "../components/BaseTemplate";
+import { Box, Container, Typography, Grid, Button } from "@mui/material";
 import PoemCard from "../components/PoemCard";
 
 const featuredPoems = [
@@ -28,7 +21,7 @@ const featuredPoems = [
 
 function Home() {
   return (
-    <BaseTemplate>
+    <Box>
       {/* Hero Section */}
       <Box
         sx={{
@@ -47,6 +40,10 @@ function Home() {
           <Button variant="contained" color="primary" size="large">
             Explore Library
           </Button>
+          {/* <Button
+            onClick={postAuthors}>
+              Add all authors
+          </Button> */}
         </Container>
       </Box>
 
@@ -71,7 +68,7 @@ function Home() {
           </Grid>
         </Container>
       </Box>
-    </BaseTemplate>
+    </Box>
   );
 }
 

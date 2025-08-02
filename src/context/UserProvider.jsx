@@ -1,7 +1,6 @@
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getCurrentUser, isLoggedIn } from "../auth/Index";
-import UserContext from "./UserContext.js";
+import UserContext from "./UserContext";
 
 function UserProvider({ children }) {
   const [user, setUser] = useState({
@@ -16,7 +15,11 @@ function UserProvider({ children }) {
     });
   }, []);
 
-  return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={{ user, setUser }}>
+      {children}
+    </UserContext.Provider>
+  );
 }
 
 export default UserProvider;

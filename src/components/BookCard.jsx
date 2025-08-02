@@ -13,13 +13,13 @@ function BookCard({
   author = "Unknown Author",
   image,
   description,
-  onClick,
 }) {
   const fallbackImage = "https://via.placeholder.com/300x400?text=No+Cover";
   return (
     <Card
       sx={{
-        maxWidth: 300,
+        width: 200,
+        height: 300,
         bgcolor: "background.paper",
         color: "text.primary",
         borderRadius: 3,
@@ -38,7 +38,6 @@ function BookCard({
           sx={{ width: 100, height: 100 }}
         />
       </Box>
-
       <CardContent>
         <Typography variant="h6" fontWeight="bold" gutterBottom>
           {title}
@@ -54,11 +53,6 @@ function BookCard({
           </Typography>
         )}
       </CardContent>
-      <CardActions>
-        <Button size="small" onClick={onClick}>
-          Read More
-        </Button>
-      </CardActions>
     </Card>
   );
 }

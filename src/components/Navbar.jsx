@@ -12,28 +12,38 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
-import { doLogout, getCurrentUser } from "../auth/Index";
-import { useEffect, useState } from "react";
+import UserContext from "../context/UserContext";
+import { useContext, useState } from "react";
+import { doLogout } from "../auth/Index";
 
-const pages = ["Home", "Books", "Authors", "About"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const pages = [
+  { label: "Home", path: "/" },
+  { label: "Books", path: "/books" },
+  { label: "Authors", path: "/authors" },
+  { label: "Add Author", path: "/add-author" },
+  { label: "About", path: "/about" },
+];
+
+const settings = [
+  { label: "Profile", path: "/profile" },
+  { label: "Account", path: "/account" },
+  { label: "Dashboard", path: "/dashboard" },
+  { label: "Logout", path: "/logout" },
+];
 
 function NavBar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const { user, setUser } = useContext(UserContext);
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
-  useEffect(() => {
-    // setUser(getCurrentUser());
-    setUser(getCurrentUser());
-  }, []);
-
   const handleLogout = () => {
     doLogout(() => {
-      //logged out
-      setUser(null);
+      setUser({
+        data: null,
+        login: false,
+      });
       navigate("/");
     });
   };
@@ -41,12 +51,15 @@ function NavBar() {
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
+
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
+
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
@@ -74,7 +87,8 @@ function NavBar() {
           >
             Pungu Store
           </Typography>
-          {/* Mobile Menu Icon */}
+
+          {/* Mobile Menu */}
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
@@ -96,18 +110,25 @@ function NavBar() {
               onClose={handleCloseNavMenu}
               sx={{ display: { xs: "block", md: "none" } }}
             >
-              {pages.map((page) => (
-                <MenuItem
-                  key={page}
-                  onClick={handleCloseNavMenu}
-                  component={Link}
-                  to={`/${page.toLowerCase()}`}
-                >
-                  <Typography textAlign="center">{page}</Typography>
-                </MenuItem>
-              ))}
+              {pages
+                .filter(
+                  ({ label }) =>
+                    label !== "Add Author" ||
+                    (label === "Add Author" && user.login)
+                )
+                .map(({ label, path }) => (
+                  <MenuItem
+                    key={label}
+                    onClick={handleCloseNavMenu}
+                    component={Link}
+                    to={path}
+                  >
+                    <Typography textAlign="center">{label}</Typography>
+                  </MenuItem>
+                ))}
             </Menu>
           </Box>
+
           {/* Mobile Logo */}
           <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
           <Typography
@@ -128,37 +149,43 @@ function NavBar() {
           >
             Pungu Store
           </Typography>
+
           {/* Desktop Nav Links */}
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => {
-              const path =
-                page.toLowerCase() === "home" ? "/" : `/${page.toLowerCase()}`;
-              const isActive = location.pathname === path;
-              return (
-                <Button
-                  key={page}
-                  component={Link}
-                  to={path}
-                  onClick={handleCloseNavMenu}
-                  sx={{
-                    my: 2,
-                    color: "white",
-                    fontWeight: isActive ? "bold" : "normal",
-                    display: "block",
-                    borderBottom: isActive ? "2px solid white" : "none",
-                  }}
-                >
-                  {page}
-                </Button>
-              );
-            })}
+            {pages
+              .filter(
+                ({ label }) =>
+                  label !== "Add Author" ||
+                  (label === "Add Author" && user.login)
+              )
+              .map(({ label, path }) => {
+                const isActive = location.pathname === path;
+                return (
+                  <Button
+                    key={label}
+                    component={Link}
+                    to={path}
+                    onClick={handleCloseNavMenu}
+                    sx={{
+                      my: 2,
+                      color: "white",
+                      fontWeight: isActive ? "bold" : "normal",
+                      display: "block",
+                      borderBottom: isActive ? "2px solid white" : "none",
+                    }}
+                  >
+                    {label}
+                  </Button>
+                );
+              })}
           </Box>
+
           {/* User Menu */}
-          {user ? (
+          {user.login ? (
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Pungu Ji" src="/static/images/avatar/2.jpg" />
+                  <Avatar alt={user.data} src="/static/images/avatar/2.jpg" />
                 </IconButton>
               </Tooltip>
               <Menu
@@ -171,17 +198,19 @@ function NavBar() {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {settings.map((setting) => (
+                {settings.map(({ label, path }) => (
                   <MenuItem
-                    key={setting}
+                    key={label}
                     onClick={() => {
-                      if (setting === "Logout") {
+                      if (label === "Logout") {
                         handleLogout();
+                      } else {
+                        navigate(path);
                       }
                       handleCloseUserMenu();
                     }}
                   >
-                    <Typography textAlign="center">{setting}</Typography>
+                    <Typography textAlign="center">{label}</Typography>
                   </MenuItem>
                 ))}
               </Menu>

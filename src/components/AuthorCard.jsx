@@ -1,6 +1,5 @@
 import {
   Card,
-  CardMedia,
   CardContent,
   Typography,
   CardActions,
@@ -9,19 +8,24 @@ import {
   Box,
 } from "@mui/material";
 
-function AuthorCard({ name = "Unknown Author", bio, image, onClick }) {
+function AuthorCard({ name = "Unknown Author", bio, image }) {
   const fallbackImage = "https://source.unsplash.com/200x200/?person,portrait";
 
   return (
     <Card
       sx={{
-        maxWidth: 300,
+        width: 200,
+        height: 300,
         bgcolor: "background.paper",
         color: "text.primary",
         borderRadius: 3,
         boxShadow: 3,
         textAlign: "center",
         p: 2,
+        transition: "transform 0.2s ease",
+        "&:hover": {
+          transform: "scale(1.03)",
+        },
       }}
     >
       <Box display="flex" justifyContent="center" mb={2}>
@@ -41,13 +45,6 @@ function AuthorCard({ name = "Unknown Author", bio, image, onClick }) {
           </Typography>
         )}
       </CardContent>
-      {onClick && (
-        <CardActions sx={{ justifyContent: "center" }}>
-          <Button size="small" onClick={onClick}>
-            View More
-          </Button>
-        </CardActions>
-      )}
     </Card>
   );
 }

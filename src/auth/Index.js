@@ -26,6 +26,15 @@ export const getCurrentUser = () => {
   }
 };
 
+//get Current User Id
+export const getCurrentUserId = () => {
+  if (isLoggedIn()) {
+    return JSON.parse(sessionStorage.getItem("data"))?.userId;
+  } else {
+    return null;
+  }
+};
+
 // get token
 export const getToken = () => {
   if (isLoggedIn()) {

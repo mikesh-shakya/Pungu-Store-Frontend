@@ -1,16 +1,31 @@
-import axios from "axios";
+import { myAxios, privateAxios } from "./Helper";
 
-const BASE_AUTHOR_URL = "http://localhost:8087/api/authors";
+// get all authors with optional sorting
+export const getAllAuthors = (sortBy = []) => {
+  const params = {};
 
-// get all authors
-export const getAllAuthors = () => {
-  return axios.get(`${BASE_AUTHOR_URL}`).then((response) => response.data);
+  if (sortBy.length > 0) {
+    params.sortBy = sortBy.join(','); // e.g., 'nationality,fullName'
+  }
+
+  return myAxios.get(`/authors`, { params }).then((response) => response.data);
 };
 
+// get author by Id
+export const getAuthor = (authorId) => {
+  return myAxios.get(`/authors/${authorId}`).then((response) => response.data);
+};
 
-// create an author
-export const createAuthor = (author) => {
-  return axios
-    .post(`${BASE_AUTHOR_URL}`, author)
+// add an author
+export const addAuthor = (author) => {
+  return privateAxios
+    .post(`/authors`, author)
+    .then((response) => response.data);
+};
+
+// update an author by Id
+export const updateAuthor = (author, authorId) => {
+  return privateAxios
+    .put(`/authors/${authorId}`, author)
     .then((response) => response.data);
 };

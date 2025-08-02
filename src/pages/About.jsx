@@ -1,10 +1,7 @@
 import { Box, Container, Typography } from "@mui/material";
-import BaseTemplate from "../components/BaseTemplate";
 
 const About = () => {
   return (
-    <BaseTemplate>
-      {/* About Section */}
       <Box sx={{ py: 8 }}>
         <Container maxWidth="md">
           <Typography variant="h5" fontWeight="bold" gutterBottom>
@@ -18,7 +15,6 @@ const About = () => {
           </Typography>
         </Container>
       </Box>
-    </BaseTemplate>
   );
 };
 

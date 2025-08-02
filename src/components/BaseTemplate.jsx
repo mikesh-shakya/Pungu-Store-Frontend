@@ -1,8 +1,9 @@
 import { Box, Container } from "@mui/material";
 import Footer from "./Footer";
 import ResponsiveAppBar from "./Navbar";
+import { Outlet } from "react-router-dom";
 
-const BaseTemplate = ({ children }) => {
+const BaseTemplate = () => {
   return (
     <Box
       sx={{
@@ -16,7 +17,7 @@ const BaseTemplate = ({ children }) => {
       <ResponsiveAppBar />
 
       <Container maxWidth={false} disableGutters sx={{ flex: 1, py: 5 }}>
-        {children}
+        <Outlet />
       </Container>
 
       <Footer />
